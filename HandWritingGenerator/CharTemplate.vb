@@ -58,7 +58,7 @@ Public Class CharTemplate
         Return charMap(c).img
     End Function
 
-    Public Sub Save(filename As String, modulusX As Double, modulusY As Double)
+    Public Sub Save(filename As String)
         Using sw As New StreamWriter(filename, False, Encoding.UTF8)
             Dim imgdata As Byte()
             Using ms As New MemoryStream()
@@ -69,31 +69,18 @@ Public Class CharTemplate
             For Each ci In charMap.Values
                 sw.Write(ci.c)
                 sw.Write(" ")
-                sw.Write(CInt(ci.rect.Left * modulusX)) '左上x
+                sw.Write(CInt(ci.rect.Left)) '左上x
                 sw.Write(" ")
-                sw.Write(CInt(ci.rect.Top * modulusY)) '左上y
+                sw.Write(CInt(ci.rect.Top)) '左上y
                 sw.Write(" ")
-                sw.Write(CInt(ci.rect.Right * modulusX)) '右上x
+                sw.Write(CInt(ci.rect.Right)) '右上x
                 sw.Write(" ")
-                sw.Write(CInt(ci.rect.Bottom * modulusY)) '右上y
+                sw.Write(CInt(ci.rect.Bottom)) '右上y
                 sw.WriteLine()
             Next
             sw.Flush()
         End Using
     End Sub
-
-    Public Sub Save(filename As String)
-        Dim dpi = GetScreenDPI()
-        'We need this to deal with DPI<>96
-        Save(filename, 3.125, 3.125)
-        'Save(filename, 96 / dpi.X, 96 / dpi.Y)
-    End Sub
-
-    Public Shared Function GetScreenDPI() As PointF
-        Using g = Graphics.FromHwnd(IntPtr.Zero)
-            Return New PointF(g.DpiX, g.DpiY)
-        End Using
-    End Function
 
     Public Function GenerateImage(lines() As String) As Image
         '预处理计算大小~
