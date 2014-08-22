@@ -1,0 +1,20 @@
+C:\Users\twd2\AppData\Local\Temporary Projects\手写体生成器\bin\Debug\手写体生成器.exe
+C:\Users\twd2\AppData\Local\Temporary Projects\手写体生成器\bin\Debug\手写体生成器.pdb
+C:\Users\twd2\AppData\Local\Temporary Projects\手写体生成器\bin\Debug\手写体生成器.xml
+C:\Users\twd2\AppData\Local\Temporary Projects\手写体生成器\obj\Debug\手写体生成器.Form1.resources
+C:\Users\twd2\AppData\Local\Temporary Projects\手写体生成器\obj\Debug\手写体生成器.frmCreate.resources
+C:\Users\twd2\AppData\Local\Temporary Projects\手写体生成器\obj\Debug\手写体生成器.Resources.resources
+C:\Users\twd2\AppData\Local\Temporary Projects\手写体生成器\obj\Debug\手写体生成器.vbproj.GenerateResource.Cache
+C:\Users\twd2\AppData\Local\Temporary Projects\手写体生成器\obj\Debug\手写体生成器.exe
+C:\Users\twd2\AppData\Local\Temporary Projects\手写体生成器\obj\Debug\手写体生成器.xml
+C:\Users\twd2\AppData\Local\Temporary Projects\手写体生成器\obj\Debug\手写体生成器.pdb
+G:\0Program\dotNet\手写体生成器\手写体生成器\obj\Debug\手写体生成器.exe
+G:\0Program\dotNet\手写体生成器\手写体生成器\obj\Debug\手写体生成器.xml
+G:\0Program\dotNet\手写体生成器\手写体生成器\obj\Debug\手写体生成器.pdb
+G:\0Program\dotNet\手写体生成器\手写体生成器\bin\Debug\手写体生成器.exe
+G:\0Program\dotNet\手写体生成器\手写体生成器\bin\Debug\手写体生成器.pdb
+G:\0Program\dotNet\手写体生成器\手写体生成器\bin\Debug\手写体生成器.xml
+G:\0Program\dotNet\手写体生成器\手写体生成器\obj\Debug\手写体生成器.Form1.resources
+G:\0Program\dotNet\手写体生成器\手写体生成器\obj\Debug\手写体生成器.frmCreate.resources
+G:\0Program\dotNet\手写体生成器\手写体生成器\obj\Debug\手写体生成器.Resources.resources
+G:\0Program\dotNet\手写体生成器\手写体生成器\obj\Debug\手写体生成器.vbproj.GenerateResource.Cache
