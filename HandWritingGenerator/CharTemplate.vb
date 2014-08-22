@@ -12,12 +12,6 @@ Public Class CharTemplate
     End Sub
 
     Public Shared Function Load(filename As String) As CharTemplate
-        Dim dpi = GetScreenDPI()
-        'We need this to deal with DPI<>96
-        Return Load(filename, dpi.X / 96, dpi.Y / 96)
-    End Function
-
-    Public Shared Function Load(filename As String, modulusX As Double, modulusY As Double) As CharTemplate
         Dim ct As New CharTemplate
 
         Using sr As New StreamReader(filename, Encoding.UTF8)
@@ -27,10 +21,10 @@ Public Class CharTemplate
             Do While Not sr.EndOfStream
                 Dim strdata = sr.ReadLine()
                 Dim data = strdata.Substring(1).Split({" "c}, StringSplitOptions.RemoveEmptyEntries)
-                Dim x1 As Integer = modulusX * Int32.Parse(data(0)),
-                    y1 As Integer = modulusY * Int32.Parse(data(1)),
-                    x2 As Integer = modulusX * Int32.Parse(data(2)),
-                    y2 As Integer = modulusY * Int32.Parse(data(3))
+                Dim x1 As Integer = Int32.Parse(data(0)),
+                    y1 As Integer = Int32.Parse(data(1)),
+                    x2 As Integer = Int32.Parse(data(2)),
+                    y2 As Integer = Int32.Parse(data(3))
                 Dim rect As New Rectangle(Math.Min(x1, x2), Math.Min(y1, y2), Math.Abs(x1 - x2), Math.Abs(y1 - y2))
                 Dim currChar As New CharInfo(strdata(0), rect)
                 currChar.MakeCache(ct.MainImg)
@@ -91,7 +85,8 @@ Public Class CharTemplate
     Public Sub Save(filename As String)
         Dim dpi = GetScreenDPI()
         'We need this to deal with DPI<>96
-        Save(filename, 96 / dpi.X, 96 / dpi.Y)
+        Save(filename, 3.125, 3.125)
+        'Save(filename, 96 / dpi.X, 96 / dpi.Y)
     End Sub
 
     Public Shared Function GetScreenDPI() As PointF
@@ -137,6 +132,7 @@ Public Class CharTemplate
         End If
 
         Dim result As New Bitmap(maxw, maxh * lines.Count)
+        result.SetResolution(MainImg.HorizontalResolution, MainImg.VerticalResolution)
         Using g = Graphics.FromImage(result)
             For y = 0 To lines.Count - 1
                 Dim line = lines(y)

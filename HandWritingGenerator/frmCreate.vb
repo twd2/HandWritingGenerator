@@ -11,7 +11,7 @@ Public Class frmCreate
 
     Dim _Clicked As Boolean = False
 
-    Dim _DisplayImg As Image = Nothing
+    Dim _DisplayImg As Bitmap = Nothing
     Dim _DisplayG As Graphics
     Dim _offsetX = 0, _offsetY = 0
     Dim _TOffsetValue = 0, _BOffsetValue = 10, _LOffsetValue = 0, _ROffsetValue = 0
@@ -90,7 +90,7 @@ Public Class frmCreate
             Return
         End If
         Try
-            Dim absPoint As New Point(e.X - _offsetX, e.Y)
+            Dim absPoint As New Point(e.X - _offsetX, e.Y - _offsetY)
             Select Case _LRTB
                 Case LRTB.Left
                     LOffset.Value = absPoint.X
@@ -164,6 +164,16 @@ Public Class frmCreate
         Else
             _CharTemplate.charMap.Add(ci.c, ci)
         End If
+        If _EnabledAutoCalc Then
+            If _LOffsetValue <> _LastCalcLOffset Then
+                _LAdjustCount += 1
+                _LAdjustSum += _LOffsetValue - _LastCalcLOffset
+            End If
+            If _ROffsetValue <> _LastCalcROffset Then
+                _RAdjustCount += 1
+                _RAdjustSum += _ROffsetValue - _LastCalcROffset
+            End If
+        End If
         '_lstChars.Add(New myChar With {.c = TextBox1.Text, .x1 = LOffset.Value, .x2 = ROffset.Value, .y1 = TOffset.Value, .y2 = BOffset.Value})
         RefreshTable()
     End Sub
@@ -229,6 +239,8 @@ Public Class frmCreate
             _DisplayImg = Nothing
         End If
         _DisplayImg = New Bitmap(_CharTemplate.MainImg.Width, _CharTemplate.MainImg.Height)
+        _DisplayImg.SetResolution(_CharTemplate.MainImg.HorizontalResolution,
+                                _CharTemplate.MainImg.VerticalResolution)
         DisplayOffsetX.Maximum = _CharTemplate.MainImg.Width
         DisplayOffsetY.Maximum = _CharTemplate.MainImg.Height
         LOffset.Maximum = _CharTemplate.MainImg.Width
@@ -272,5 +284,85 @@ Public Class frmCreate
             End If
             _CharTemplate.MainImg.Save(SFD.FileName)
         End Using
+    End Sub
+
+
+    Private Sub 生成图线GToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles 生成图线GToolStripMenuItem.Click
+        If _CharTemplate Is Nothing Then
+            Return
+        End If
+        Using sw As New StreamWriter("xx.csv", False)
+            Dim data = ImageProcessor.CalcVerticalBlackCount(_CharTemplate.MainImg, _LOffsetValue, _CharTemplate.MainImg.Width - 1, _TOffsetValue, _BOffsetValue)
+            Dim T = ImageProcessor.FindCountThreshold(data)
+            Dim lst = ImageProcessor.SplitCount(data, T)
+            Dim minlength = ImageProcessor.FindFragmentThreshold(lst)
+            ImageProcessor.CombineFragment(lst, minlength)
+            For i = 0 To data.Length - 1
+                sw.WriteLine("{0},{1}", i, data(i))
+            Next
+        End Using
+    End Sub
+
+    Private Sub frmCreate_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+
+    End Sub
+
+    Dim _EnabledAutoCalc As Boolean = False
+    'Dim _CharRegionsOffset As Integer = 0
+    'Dim _CharRegions As List(Of CharRegion) = Nothing
+    'Dim _CharRegionsIndex As Integer = 0
+    Dim _LAdjustCount As Integer = 0
+    Dim _LAdjustSum As Long = 0
+    Dim _RAdjustCount As Integer = 0
+    Dim _RAdjustSum As Long = 0
+    Dim _LastCalcLOffset As Integer
+    Dim _LastCalcROffset As Integer
+
+    Private Sub Button1_Click_1(sender As Object, e As EventArgs) Handles Button1.Click
+        'If _CharRegions Is Nothing Then
+
+        'test
+        'Dim gr = ImageProcessor.ToGray(_CharTemplate.MainImg)
+        'Dim bint = ImageProcessor.FindThreshold(gr)
+        '_CharTemplate.MainImg = ImageProcessor.BinarizationBitmap(ImageProcessor.Binarization(gr, bint))
+        ''_CharTemplate.MainImg = ImageProcessor.GrayBitmap(gr)
+        PictureBox1.Refresh()
+        Dim data = ImageProcessor.CalcVerticalBlackCount(_CharTemplate.MainImg, _ROffsetValue + 1, _CharTemplate.MainImg.Width - 1, _TOffsetValue, _BOffsetValue)
+        Dim T = 5 'ImageProcessor.FindCountThreshold(data)
+        Dim CharRegions = ImageProcessor.SplitCount(data, T)
+        Dim CharRegionsOffset = _ROffsetValue
+        Dim minlength = ImageProcessor.FindFragmentThreshold(CharRegions)
+        ImageProcessor.CombineFragment(CharRegions, minlength)
+        Dim CharRegionsIndex = 0
+        Do While CharRegionsIndex <= CharRegions.Count - 1 AndAlso CharRegions(CharRegionsIndex).Type <> CharRegionType.Char
+            CharRegionsIndex += 1
+        Loop
+
+        'End If
+        If CharRegionsIndex > CharRegions.Count - 1 Then
+            MsgBox("找不到了")
+            Return
+        End If
+     
+
+        LOffset.Value = CharRegionsOffset + CharRegions(CharRegionsIndex).LeftOffset
+        If _LAdjustCount > 0 Then
+            Dim ladjoff = _LAdjustSum / _LAdjustCount
+            LOffset.Value += ladjoff
+        End If
+        ROffset.Value = CharRegionsOffset + CharRegions(CharRegionsIndex).RightOffset
+        If _RAdjustCount > 0 Then
+            Dim radjoff = _RAdjustSum / _RAdjustCount
+            ROffset.Value += radjoff
+        End If
+
+        _LOffsetValue = LOffset.Value
+        _LastCalcLOffset = LOffset.Value
+        _ROffsetValue = ROffset.Value
+        _LastCalcROffset = ROffset.Value
+
+        TextBox1.Text = ChrW(AscW(TextBox1.Text) + 1)
+
+        _EnabledAutoCalc = True
     End Sub
 End Class

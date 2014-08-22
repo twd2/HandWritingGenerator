@@ -15,16 +15,8 @@
         'Me.img = CutImg(mainimg, rect)
     End Sub
 
-    Private Function CutImg(src As Image, rect As Rectangle) As Image
-        Dim result As New Bitmap(rect.Width, rect.Height)
-        Using g = Graphics.FromImage(result)
-            g.DrawImage(src, -rect.X, -rect.Y)
-        End Using
-        Return result
-    End Function
-
     Public Sub MakeCache(mainimg As Image)
-        img = CutImg(mainimg, rect)
+        img = ImageProcessor.CutImg(mainimg, rect)
     End Sub
 
 End Class

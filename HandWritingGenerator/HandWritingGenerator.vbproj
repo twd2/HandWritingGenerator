@@ -70,6 +70,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CharInfo.vb" />
+    <Compile Include="CharRegion.vb" />
     <Compile Include="CharTemplate.vb" />
     <Compile Include="frmMain.vb">
       <SubType>Form</SubType>
@@ -84,6 +85,8 @@
     <Compile Include="frmCreate.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="ImageData.vb" />
+    <Compile Include="ImageProcessor.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
       <AutoGen>True</AutoGen>

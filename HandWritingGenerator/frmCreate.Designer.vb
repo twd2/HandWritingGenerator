@@ -25,6 +25,9 @@ Partial Class frmCreate
         Me.components = New System.ComponentModel.Container()
         Me.btnOpenImage = New System.Windows.Forms.Button()
         Me.PictureBox1 = New System.Windows.Forms.PictureBox()
+        Me.ContextMenuStrip1 = New System.Windows.Forms.ContextMenuStrip(Me.components)
+        Me.SaveImageToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.生成图线GToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.DisplayOffsetX = New System.Windows.Forms.TrackBar()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.TextBox1 = New System.Windows.Forms.TextBox()
@@ -51,24 +54,23 @@ Partial Class frmCreate
         Me.DisplayOffsetY = New System.Windows.Forms.TrackBar()
         Me.Label6 = New System.Windows.Forms.Label()
         Me.Label7 = New System.Windows.Forms.Label()
-        Me.ContextMenuStrip1 = New System.Windows.Forms.ContextMenuStrip(Me.components)
-        Me.SaveImageToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.Button1 = New System.Windows.Forms.Button()
         CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.ContextMenuStrip1.SuspendLayout()
         CType(Me.DisplayOffsetX, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.LOffset, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.TOffset, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.ROffset, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.BOffset, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.DisplayOffsetY, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.ContextMenuStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
         'btnOpenImage
         '
-        Me.btnOpenImage.Location = New System.Drawing.Point(16, 132)
+        Me.btnOpenImage.Location = New System.Drawing.Point(16, 89)
         Me.btnOpenImage.Margin = New System.Windows.Forms.Padding(4)
         Me.btnOpenImage.Name = "btnOpenImage"
-        Me.btnOpenImage.Size = New System.Drawing.Size(147, 29)
+        Me.btnOpenImage.Size = New System.Drawing.Size(101, 25)
         Me.btnOpenImage.TabIndex = 0
         Me.btnOpenImage.Text = "打开图片"
         Me.btnOpenImage.UseVisualStyleBackColor = True
@@ -82,10 +84,27 @@ Partial Class frmCreate
         Me.PictureBox1.Location = New System.Drawing.Point(16, 640)
         Me.PictureBox1.Margin = New System.Windows.Forms.Padding(4)
         Me.PictureBox1.Name = "PictureBox1"
-        Me.PictureBox1.Size = New System.Drawing.Size(635, 82)
-        Me.PictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.AutoSize
+        Me.PictureBox1.Size = New System.Drawing.Size(850, 156)
         Me.PictureBox1.TabIndex = 1
         Me.PictureBox1.TabStop = False
+        '
+        'ContextMenuStrip1
+        '
+        Me.ContextMenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.SaveImageToolStripMenuItem, Me.生成图线GToolStripMenuItem})
+        Me.ContextMenuStrip1.Name = "ContextMenuStrip1"
+        Me.ContextMenuStrip1.Size = New System.Drawing.Size(160, 52)
+        '
+        'SaveImageToolStripMenuItem
+        '
+        Me.SaveImageToolStripMenuItem.Name = "SaveImageToolStripMenuItem"
+        Me.SaveImageToolStripMenuItem.Size = New System.Drawing.Size(159, 24)
+        Me.SaveImageToolStripMenuItem.Text = "保存图片(&S)"
+        '
+        '生成图线GToolStripMenuItem
+        '
+        Me.生成图线GToolStripMenuItem.Name = "生成图线GToolStripMenuItem"
+        Me.生成图线GToolStripMenuItem.Size = New System.Drawing.Size(159, 24)
+        Me.生成图线GToolStripMenuItem.Text = "生成图线(&G)"
         '
         'DisplayOffsetX
         '
@@ -260,10 +279,10 @@ Partial Class frmCreate
         '
         'btnSaveTemplate
         '
-        Me.btnSaveTemplate.Location = New System.Drawing.Point(16, 169)
+        Me.btnSaveTemplate.Location = New System.Drawing.Point(16, 122)
         Me.btnSaveTemplate.Margin = New System.Windows.Forms.Padding(4)
         Me.btnSaveTemplate.Name = "btnSaveTemplate"
-        Me.btnSaveTemplate.Size = New System.Drawing.Size(147, 28)
+        Me.btnSaveTemplate.Size = New System.Drawing.Size(102, 28)
         Me.btnSaveTemplate.TabIndex = 17
         Me.btnSaveTemplate.Text = "保存模板"
         Me.btnSaveTemplate.UseVisualStyleBackColor = True
@@ -272,16 +291,16 @@ Partial Class frmCreate
         '
         Me.btnNewTemplate.Location = New System.Drawing.Point(16, 12)
         Me.btnNewTemplate.Name = "btnNewTemplate"
-        Me.btnNewTemplate.Size = New System.Drawing.Size(102, 59)
+        Me.btnNewTemplate.Size = New System.Drawing.Size(102, 33)
         Me.btnNewTemplate.TabIndex = 18
         Me.btnNewTemplate.Text = "新建模板"
         Me.btnNewTemplate.UseVisualStyleBackColor = True
         '
         'btnOpenTemplate
         '
-        Me.btnOpenTemplate.Location = New System.Drawing.Point(16, 77)
+        Me.btnOpenTemplate.Location = New System.Drawing.Point(16, 51)
         Me.btnOpenTemplate.Name = "btnOpenTemplate"
-        Me.btnOpenTemplate.Size = New System.Drawing.Size(102, 47)
+        Me.btnOpenTemplate.Size = New System.Drawing.Size(102, 29)
         Me.btnOpenTemplate.TabIndex = 19
         Me.btnOpenTemplate.Text = "打开模板"
         Me.btnOpenTemplate.UseVisualStyleBackColor = True
@@ -314,23 +333,21 @@ Partial Class frmCreate
         Me.Label7.TabIndex = 22
         Me.Label7.Text = "垂直移动"
         '
-        'ContextMenuStrip1
+        'Button1
         '
-        Me.ContextMenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.SaveImageToolStripMenuItem})
-        Me.ContextMenuStrip1.Name = "ContextMenuStrip1"
-        Me.ContextMenuStrip1.Size = New System.Drawing.Size(158, 28)
-        '
-        'SaveImageToolStripMenuItem
-        '
-        Me.SaveImageToolStripMenuItem.Name = "SaveImageToolStripMenuItem"
-        Me.SaveImageToolStripMenuItem.Size = New System.Drawing.Size(157, 24)
-        Me.SaveImageToolStripMenuItem.Text = "保存图片(&S)"
+        Me.Button1.Location = New System.Drawing.Point(16, 157)
+        Me.Button1.Name = "Button1"
+        Me.Button1.Size = New System.Drawing.Size(148, 41)
+        Me.Button1.TabIndex = 23
+        Me.Button1.Text = "下一个字符"
+        Me.Button1.UseVisualStyleBackColor = True
         '
         'frmCreate
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 15.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(879, 809)
+        Me.Controls.Add(Me.Button1)
         Me.Controls.Add(Me.Label7)
         Me.Controls.Add(Me.Label6)
         Me.Controls.Add(Me.DisplayOffsetY)
@@ -358,13 +375,13 @@ Partial Class frmCreate
         Me.Name = "frmCreate"
         Me.Text = "模版编辑器"
         CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.ContextMenuStrip1.ResumeLayout(False)
         CType(Me.DisplayOffsetX, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.LOffset, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.TOffset, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.ROffset, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.BOffset, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.DisplayOffsetY, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.ContextMenuStrip1.ResumeLayout(False)
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -399,4 +416,6 @@ Partial Class frmCreate
     Friend WithEvents Label7 As System.Windows.Forms.Label
     Friend WithEvents ContextMenuStrip1 As System.Windows.Forms.ContextMenuStrip
     Friend WithEvents SaveImageToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents 生成图线GToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
+    Friend WithEvents Button1 As System.Windows.Forms.Button
 End Class
