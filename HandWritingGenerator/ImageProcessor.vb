@@ -6,40 +6,6 @@ Public Class ImageProcessor
         Return r * 0.299 + g * 0.587 + b * 0.114
     End Function
 
-    Public Shared Function BinarizationBitmap(bin As BinaryData) As Bitmap
-        Dim bmp As New Bitmap(bin.Height, bin.Width)
-        Dim id = RawData.FromBitmap(bmp)
-        For y = 0 To bmp.Height - 1
-            For x = 0 To bmp.Width - 1
-                Dim a = IIf(bin(y, x), 0, 255)
-                id(y, x, 0) = a
-                id(y, x, 1) = a
-                id(y, x, 2) = a
-            Next
-        Next
-        Dim bmpdata = bmp.LockBits(New Rectangle(0, 0, bmp.Width, bmp.Height), Imaging.ImageLockMode.WriteOnly, Imaging.PixelFormat.Format24bppRgb)
-        Marshal.Copy(id.data, 0, bmpdata.Scan0, id.Size())
-        bmp.UnlockBits(bmpdata)
-        Return bmp
-    End Function
-
-    Public Shared Function GrayBitmap(gr As GrayData) As Bitmap
-        Dim bmp As New Bitmap(gr.Width, gr.Height)
-        Dim id = RawData.FromBitmap(bmp)
-        For y = 0 To bmp.Height - 1
-            For x = 0 To bmp.Width - 1
-                Dim a = gr(y, x)
-                id(y, x, 0) = a
-                id(y, x, 1) = a
-                id(y, x, 2) = a
-            Next
-        Next
-        Dim bmpdata = bmp.LockBits(New Rectangle(0, 0, bmp.Width, bmp.Height), Imaging.ImageLockMode.WriteOnly, Imaging.PixelFormat.Format24bppRgb)
-        Marshal.Copy(id.data, 0, bmpdata.Scan0, id.Size())
-        bmp.UnlockBits(bmpdata)
-        Return bmp
-    End Function
-
     '寻找二值化的阈值
     Public Shared Function FindBinarizationThreshold(gr As GrayData, Optional accuracy As Double = 0.1) As Double
         Dim lastT = 0.0, T = 127.5
