@@ -30,6 +30,11 @@
         End Get
     End Property
 
+    Public Shared Function FromBitmap(bmp As Bitmap) As GrayData
+        Dim rd = RawData.FromBitmap(bmp)
+        Return FromRawData(rd)
+    End Function
+
     Public Shared Function FromRawData(rd As RawData) As GrayData
         Dim gr As New GrayData(rd.Width, rd.Height, rd.xDPI, rd.yDPI)
         For y = 0 To rd.Height - 1

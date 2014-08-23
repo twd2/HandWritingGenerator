@@ -6,7 +6,7 @@ Public Class Tokenizer
     Private _Tokens As List(Of String) = Nothing
     Private _i As Integer = 0
     Public Const WordChar As String = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
-    Public Const SplitChar As String = " `~!@#$%^&*()_+-={}|[]\:"";'<>?,./"
+    Public Const SplitChar As String = " `~!@#$%^&*()_+-={}|[]\:"";'<>?,./" + vbCrLf
     Public Const WithSpaceChar As String = ",.?!;:"
     Public Const SpaceChar As Char = " "c
     Public Const Newline As String = vbCrLf
@@ -55,6 +55,9 @@ Public Class Tokenizer
                 currString = ""
                 End If
         Next
+        If currString <> "" Then
+            _Tokens.Add(currString)
+        End If
         '_Tokens.RemoveAll(Function(s As String)
         '                      Return s.Trim() = ""
         '                  End Function)

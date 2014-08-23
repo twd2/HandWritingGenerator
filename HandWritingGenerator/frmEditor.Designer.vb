@@ -92,18 +92,19 @@ Partial Class frmEditor
         '
         Me.ContextMenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.SaveImageToolStripMenuItem, Me.生成图线GToolStripMenuItem})
         Me.ContextMenuStrip1.Name = "ContextMenuStrip1"
-        Me.ContextMenuStrip1.Size = New System.Drawing.Size(160, 52)
+        Me.ContextMenuStrip1.Size = New System.Drawing.Size(176, 80)
         '
         'SaveImageToolStripMenuItem
         '
         Me.SaveImageToolStripMenuItem.Name = "SaveImageToolStripMenuItem"
-        Me.SaveImageToolStripMenuItem.Size = New System.Drawing.Size(159, 24)
+        Me.SaveImageToolStripMenuItem.Size = New System.Drawing.Size(175, 24)
         Me.SaveImageToolStripMenuItem.Text = "保存图片(&S)"
         '
         '生成图线GToolStripMenuItem
         '
+        Me.生成图线GToolStripMenuItem.Enabled = False
         Me.生成图线GToolStripMenuItem.Name = "生成图线GToolStripMenuItem"
-        Me.生成图线GToolStripMenuItem.Size = New System.Drawing.Size(159, 24)
+        Me.生成图线GToolStripMenuItem.Size = New System.Drawing.Size(175, 24)
         Me.生成图线GToolStripMenuItem.Text = "生成图线(&G)"
         '
         'DisplayOffsetX
@@ -342,7 +343,7 @@ Partial Class frmEditor
         Me.Button1.Text = "下一个字符"
         Me.Button1.UseVisualStyleBackColor = True
         '
-        'frmCreate
+        'frmEditor
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 15.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
@@ -372,7 +373,7 @@ Partial Class frmEditor
         Me.Controls.Add(Me.PictureBox1)
         Me.Controls.Add(Me.btnOpenImage)
         Me.Margin = New System.Windows.Forms.Padding(4)
-        Me.Name = "frmCreate"
+        Me.Name = "frmEditor"
         Me.Text = "模板编辑器"
         CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ContextMenuStrip1.ResumeLayout(False)

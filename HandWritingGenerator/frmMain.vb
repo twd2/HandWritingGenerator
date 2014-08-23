@@ -1,4 +1,5 @@
 ﻿Imports System.IO
+Imports System.Drawing.Imaging
 
 Public Class frmMain
 
@@ -28,28 +29,40 @@ Public Class frmMain
     End Function
 
     Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
-        PictureBox1.Image = ToImgByTemplate({"he"})
-        'PictureBox1.Image = ToImgByTemplate({"hello, world",
-        '                                     "abcde9f8g7h6i5j4k3l2m1n0",
-        '                                     "The quick brown fox jumps over the lazy dog."})
+        'PictureBox1.Image = ToImgByTemplate({"he"})
+        PictureBox1.Image = ToImgByTemplate({"hello, world",
+                                             "abcde9f8g7h6i5j4k3l2m1n0",
+                                             "The quick brown fox jumps over the lazy dog."})
         PictureBox1.Refresh()
     End Sub
 
     Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
-        'Dim PageSizeW = 100 '每行字符数
-        Dim PageSizeH = 39 '行数
+        If Not RequireTemplate() Then
+            Return
+        End If
+        Dim A4Width = 7 'inch
+        Dim A4Height = 11 'inch
+        Dim PageWidthPx As Integer = A4Width * _CharTemplate.MainImg.HorizontalResolution
+        Dim PageHeightPx As Integer = A4Height * _CharTemplate.MainImg.VerticalResolution
+        Dim PageHeightCount As Integer = PageHeightPx / _CharTemplate.MinHeight
         Using OFD As New OpenFileDialog
             OFD.Title = "文字"
             OFD.Filter = "文字|*.txt"
             If OFD.ShowDialog() <> Windows.Forms.DialogResult.OK Then
                 Return
             End If
-            Dim lns = File.ReadAllLines(OFD.FileName)
+            Dim tokens As New Tokenizer(File.ReadAllText(OFD.FileName))
+            tokens.Scan()
+            Dim typeset As New Typesetter(tokens, _CharTemplate)
+            typeset.PageWidth = PageWidthPx
+            typeset.Typeset(False)
+            Dim lns = typeset.ToString().Split({vbCrLf}, StringSplitOptions.None)
             Dim lstPage As New List(Of List(Of String))
             Dim currPage As New List(Of String)
 
+            '分页
             For i = 0 To lns.Count - 1
-                If (i + 1) Mod PageSizeH = 0 Then
+                If (i + 1) Mod PageHeightCount = 0 Then
                     lstPage.Add(currPage)
                     currPage = New List(Of String)
                 End If
@@ -58,10 +71,17 @@ Public Class frmMain
             If currPage.Count > 0 Then
                 lstPage.Add(currPage)
             End If
-            For i = 0 To lstPage.Count - 1
-                ToImgByTemplate(lstPage(i).ToArray()).Save("gen\" & i.ToString() & ".jpg")
-            Next
 
+            Dim SaveTo = OFD.FileName + ".gen"
+
+            If Not Directory.Exists(SaveTo) Then
+                Directory.CreateDirectory(SaveTo)
+            End If
+
+            For i = 0 To lstPage.Count - 1
+                ToImgByTemplate(lstPage(i).ToArray()).Save(SaveTo + "\P" & i.ToString() & ".jpg")
+            Next
+            MsgBox("完成")
         End Using
 
     End Sub
@@ -83,7 +103,17 @@ Public Class frmMain
     End Function
 
     Private Sub TextBox1_TextChanged(sender As Object, e As EventArgs) Handles TextBox1.TextChanged
-        PictureBox1.Image = ToImgByTemplate(TextBox1.Text)
+        Try
+            Dim token As New Tokenizer(TextBox1.Text)
+            token.Scan()
+            Dim ts As New Typesetter(token, _CharTemplate)
+            ts.PageWidth = PictureBox1.Width
+            'ts.PageMaxLineCount = Integer.MaxValue
+            ts.Typeset(False)
+            PictureBox1.Image = ToImgByTemplate(ts.ToString()) 'BinaryData.FromBitmap(ToImgByTemplate(ts.ToString())).ToBitmap()
+        Catch ex As Exception
+            Debug.Print(ex.ToString())
+        End Try
     End Sub
 
     Private Sub Button5_Click(sender As Object, e As EventArgs) Handles Button5.Click
@@ -94,8 +124,8 @@ Public Class frmMain
         token.Scan()
         Dim ts As New Typesetter(token, _CharTemplate)
         ts.PageWidth = 30
-        ts.PageMaxLineCount = 1000
-        ts.Typeset()
+        'ts.PageMaxLineCount = Integer.MaxValue
+        ts.Typeset(False)
         ts.ToString()
     End Sub
 
@@ -106,4 +136,17 @@ Public Class frmMain
         Return True
     End Function
 
+    Private Sub 保存图片SToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles 保存图片SToolStripMenuItem.Click
+        If PictureBox1.Image Is Nothing Then
+            Return
+        End If
+        Using SFD As New SaveFileDialog
+            SFD.Title = "保存图片"
+            SFD.Filter = "PNG|*.png"
+            If SFD.ShowDialog() <> Windows.Forms.DialogResult.OK Then
+                Return
+            End If
+            PictureBox1.Image.Save(SFD.FileName, ImageFormat.Png)
+        End Using
+    End Sub
 End Class

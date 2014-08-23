@@ -22,6 +22,7 @@ Partial Class frmMain
     '不要使用代码编辑器修改它。
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
+        Me.components = New System.ComponentModel.Container()
         Me.Button1 = New System.Windows.Forms.Button()
         Me.Button2 = New System.Windows.Forms.Button()
         Me.PictureBox1 = New System.Windows.Forms.PictureBox()
@@ -30,10 +31,13 @@ Partial Class frmMain
         Me.SplitContainer1 = New System.Windows.Forms.SplitContainer()
         Me.TextBox1 = New System.Windows.Forms.TextBox()
         Me.Button5 = New System.Windows.Forms.Button()
+        Me.ContextMenuStrip1 = New System.Windows.Forms.ContextMenuStrip(Me.components)
+        Me.保存图片SToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
         Me.SplitContainer1.SuspendLayout()
+        Me.ContextMenuStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
         'Button1
@@ -58,6 +62,7 @@ Partial Class frmMain
         '
         'PictureBox1
         '
+        Me.PictureBox1.ContextMenuStrip = Me.ContextMenuStrip1
         Me.PictureBox1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.PictureBox1.Location = New System.Drawing.Point(0, 0)
         Me.PictureBox1.Margin = New System.Windows.Forms.Padding(4)
@@ -117,6 +122,7 @@ Partial Class frmMain
         Me.TextBox1.ScrollBars = System.Windows.Forms.ScrollBars.Vertical
         Me.TextBox1.Size = New System.Drawing.Size(317, 479)
         Me.TextBox1.TabIndex = 0
+        Me.TextBox1.Text = "The quick brown fox jumps over the lazy dog."
         '
         'Button5
         '
@@ -126,6 +132,18 @@ Partial Class frmMain
         Me.Button5.TabIndex = 6
         Me.Button5.Text = "排版测试"
         Me.Button5.UseVisualStyleBackColor = True
+        '
+        'ContextMenuStrip1
+        '
+        Me.ContextMenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.保存图片SToolStripMenuItem})
+        Me.ContextMenuStrip1.Name = "ContextMenuStrip1"
+        Me.ContextMenuStrip1.Size = New System.Drawing.Size(158, 28)
+        '
+        '保存图片SToolStripMenuItem
+        '
+        Me.保存图片SToolStripMenuItem.Name = "保存图片SToolStripMenuItem"
+        Me.保存图片SToolStripMenuItem.Size = New System.Drawing.Size(175, 24)
+        Me.保存图片SToolStripMenuItem.Text = "保存图片(&S)"
         '
         'frmMain
         '
@@ -147,6 +165,7 @@ Partial Class frmMain
         Me.SplitContainer1.Panel2.ResumeLayout(False)
         Me.SplitContainer1.Panel2.PerformLayout()
         Me.SplitContainer1.ResumeLayout(False)
+        Me.ContextMenuStrip1.ResumeLayout(False)
         Me.ResumeLayout(False)
 
     End Sub
@@ -158,5 +177,7 @@ Partial Class frmMain
     Friend WithEvents SplitContainer1 As System.Windows.Forms.SplitContainer
     Friend WithEvents TextBox1 As System.Windows.Forms.TextBox
     Friend WithEvents Button5 As System.Windows.Forms.Button
+    Friend WithEvents ContextMenuStrip1 As System.Windows.Forms.ContextMenuStrip
+    Friend WithEvents 保存图片SToolStripMenuItem As System.Windows.Forms.ToolStripMenuItem
 
 End Class

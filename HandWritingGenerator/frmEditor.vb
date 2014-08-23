@@ -1,4 +1,5 @@
 ﻿Imports System.IO
+Imports System.Drawing.Imaging
 
 Public Class frmEditor
 
@@ -51,7 +52,11 @@ Public Class frmEditor
             _DisplayG.DrawLine(Pens.Red, 0 + _offsetX, _TOffsetValue + _offsetY, _CharTemplate.MainImg.Width + _offsetX, _TOffsetValue + _offsetY)
             '下
             _DisplayG.DrawLine(Pens.Green, 0 + _offsetX, _BOffsetValue + _offsetY, _CharTemplate.MainImg.Width + _offsetX, _BOffsetValue + _offsetY)
-            PictureBox1.Refresh()
+            Try
+                PictureBox1.Refresh()
+            Catch ex As Exception
+
+            End Try
         Catch ex As Exception
             Debug.Print(ex.ToString())
         End Try
@@ -179,6 +184,12 @@ Public Class frmEditor
     End Sub
 
     Private Sub RefreshTable()
+        'Dim selectId = -1
+        'If ListView1.SelectedIndices.Count > 0 Then
+        '    selectId = ListView1.SelectedIndices(0)
+        'End If
+
+        ListView1.BeginUpdate()
         ListView1.Items.Clear()
         For Each ci In _CharTemplate.charMap.Values
             Dim lvi As New ListViewItem(ci.c)
@@ -188,6 +199,10 @@ Public Class frmEditor
             lvi.SubItems.Add(ci.rect.Bottom)
             ListView1.Items.Add(lvi)
         Next
+        ListView1.EndUpdate()
+        'If selectId >= 0 AndAlso selectId <= ListView1.Items.Count - 1 Then
+
+        'End If
     End Sub
 
     Private Sub ListView1_DoubleClick(sender As Object, e As EventArgs) Handles ListView1.DoubleClick
@@ -209,8 +224,17 @@ Public Class frmEditor
         ROffset.Value = ci.rect.Right
         TOffset.Value = ci.rect.Top
         BOffset.Value = ci.rect.Bottom
-        DisplayOffsetX.Value = Math.Min(LOffset.Value, DisplayOffsetX.Value)
+        AutoPostion()
+        RefreshImg()
+    End Sub
+
+    Private Sub AutoPostion()
+        DisplayOffsetX.Value = Math.Max(Math.Min(LOffset.Value - 10, DisplayOffsetX.Value), DisplayOffsetX.Minimum)
+        DisplayOffsetX.Value = Math.Min(Math.Max(10 + ROffset.Value - PictureBox1.Width, DisplayOffsetX.Value), DisplayOffsetX.Maximum)
         _offsetX = -DisplayOffsetX.Value
+        DisplayOffsetY.Value = Math.Max(Math.Min(TOffset.Value - 10, DisplayOffsetY.Value), DisplayOffsetY.Minimum)
+        DisplayOffsetY.Value = Math.Min(Math.Max(10 + BOffset.Value - PictureBox1.Height, DisplayOffsetY.Value), DisplayOffsetY.Maximum)
+        _offsetY = -DisplayOffsetY.Value
         RefreshImg()
     End Sub
 
@@ -278,29 +302,29 @@ Public Class frmEditor
         End If
         Using SFD As New SaveFileDialog
             SFD.Title = "保存图片"
-            SFD.Filter = "JPEG|*.jpg"
+            SFD.Filter = "PNG|*.png"
             If SFD.ShowDialog() <> Windows.Forms.DialogResult.OK Then
                 Return
             End If
-            _CharTemplate.MainImg.Save(SFD.FileName)
+            _CharTemplate.MainImg.Save(SFD.FileName, ImageFormat.Png)
         End Using
     End Sub
 
 
     Private Sub 生成图线GToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles 生成图线GToolStripMenuItem.Click
-        If _CharTemplate Is Nothing Then
-            Return
-        End If
-        Using sw As New StreamWriter("xx.csv", False)
-            Dim data = ImageProcessor.CalcVerticalBlackCount(_CharTemplate.MainImg, _LOffsetValue, _CharTemplate.MainImg.Width - 1, _TOffsetValue, _BOffsetValue)
-            Dim T = ImageProcessor.FindCountThreshold(data)
-            Dim lst = ImageProcessor.SplitCount(data, T)
-            Dim minlength = ImageProcessor.FindFragmentThreshold(lst)
-            ImageProcessor.CombineFragment(lst, minlength)
-            For i = 0 To data.Length - 1
-                sw.WriteLine("{0},{1}", i, data(i))
-            Next
-        End Using
+        'If _CharTemplate Is Nothing Then
+        '    Return
+        'End If
+        'Using sw As New StreamWriter("xx.csv", False)
+        '    Dim data = ImageProcessor.CalcVerticalBlackCount(_CharTemplate.MainImg, _LOffsetValue, _CharTemplate.MainImg.Width - 1, _TOffsetValue, _BOffsetValue)
+        '    Dim T = ImageProcessor.FindCountThreshold(data)
+        '    Dim lst = ImageProcessor.SplitCount(data, T)
+        '    Dim minlength = ImageProcessor.FindFragmentThreshold(lst)
+        '    ImageProcessor.CombineFragment(lst, minlength)
+        '    For i = 0 To data.Length - 1
+        '        sw.WriteLine("{0},{1}", i, data(i))
+        '    Next
+        'End Using
     End Sub
 
     Private Sub frmCreate_Load(sender As Object, e As EventArgs) Handles MyBase.Load
@@ -322,11 +346,11 @@ Public Class frmEditor
         'If _CharRegions Is Nothing Then
 
         'test
-        'Dim gr = ImageProcessor.ToGray(_CharTemplate.MainImg)
-        'Dim bint = ImageProcessor.FindThreshold(gr)
-        '_CharTemplate.MainImg = ImageProcessor.BinarizationBitmap(ImageProcessor.Binarization(gr, bint))
+        'Dim rd = RawData.FromBitmap(_CharTemplate.MainImg)
+        'Dim bin = BinaryData.FromRawData(rd)
+        '_CharTemplate.MainImg = bin.ToBitmap()
         ''_CharTemplate.MainImg = ImageProcessor.GrayBitmap(gr)
-        PictureBox1.Refresh()
+        'PictureBox1.Refresh()
         Dim data = ImageProcessor.CalcVerticalBlackCount(_CharTemplate.MainImg, _ROffsetValue + 1, _CharTemplate.MainImg.Width - 1, _TOffsetValue, _BOffsetValue)
         Dim T = 5 'ImageProcessor.FindCountThreshold(data)
         Dim CharRegions = ImageProcessor.SplitCount(data, T)
@@ -360,6 +384,7 @@ Public Class frmEditor
         _LastCalcLOffset = LOffset.Value
         _ROffsetValue = ROffset.Value
         _LastCalcROffset = ROffset.Value
+        AutoPostion()
 
         TextBox1.Text = ChrW(AscW(TextBox1.Text) + 1)
 

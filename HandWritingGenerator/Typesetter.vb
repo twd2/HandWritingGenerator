@@ -6,7 +6,7 @@ Public Class Typesetter
     Private _CharInfo As Dictionary(Of Char, CharInfo)
     Private _Template As CharTemplate
     Public PageWidth As Integer = 0
-    Public PageMaxLineCount As Integer = 0
+    'Public PageMaxLineCount As Integer = 0
     Private _sb As StringBuilder = Nothing
 
     Public Sub New(tokens As Tokenizer, temp As CharTemplate)
@@ -30,7 +30,7 @@ Public Class Typesetter
         Return width
     End Function
 
-    Public Sub Typeset()
+    Public Sub Typeset(PunctuationWithSpace As Boolean)
         _sb = New StringBuilder()
         Dim currLineWidth = 0
         Do While _Tokens.HaveNext()
@@ -42,20 +42,24 @@ Public Class Typesetter
                     currLineWidth += GetTokenWidth(token)
                 Else
                     If Tokenizer.WithSpaceChar.IndexOf(token(0)) >= 0 Then '后面需要一个空格
-                        Dim haveSpace = False
-                        If _Tokens.HaveNext() Then
-                            haveSpace = (_Tokens.Take() = Tokenizer.SpaceChar.ToString())
-                            _Tokens.Untake()
-                        End If
                         _sb.Append(token) '直接添加
                         currLineWidth += GetTokenWidth(token)
-                        If Not haveSpace Then
-                            _sb.Append(Tokenizer.SpaceChar)
-                            currLineWidth += GetTokenWidth(token)
+                        If PunctuationWithSpace Then '后面跟空格的字符自动添加空格
+                            Dim haveSpace = False
+                            If _Tokens.HaveNext() Then
+                                haveSpace = (_Tokens.Take() = Tokenizer.SpaceChar.ToString())
+                                _Tokens.Untake()
+                            End If
+
+                            If Not haveSpace Then
+                                _sb.Append(Tokenizer.SpaceChar)
+                                currLineWidth += GetTokenWidth(token)
+                            End If
                         End If
                     Else
                         If Tokenizer.Newline.IndexOf(token(0)) >= 0 Then '换行符
-                            'ignore
+                            currLineWidth = 0
+                            _sb.Append(token)
                         Else
                             tryAppend = True
                         End If
@@ -83,6 +87,8 @@ Public Class Typesetter
             '    currLineWidth = 0
             'End If
         Loop
+        _sb.AppendLine() '新行
+        currLineWidth = 0
     End Sub
 
     Public Shadows Function ToString() As String

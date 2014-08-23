@@ -6,6 +6,8 @@ Public Class CharTemplate
 
     Public charMap As New Dictionary(Of Char, CharInfo)
     Public MainImg As Bitmap = Nothing
+    Public MaxHeight As Integer = 0
+    Public MinHeight As Integer = Integer.MaxValue
 
     Public Sub New()
 
@@ -26,6 +28,12 @@ Public Class CharTemplate
                     x2 As Integer = Int32.Parse(data(2)),
                     y2 As Integer = Int32.Parse(data(3))
                 Dim rect As New Rectangle(Math.Min(x1, x2), Math.Min(y1, y2), Math.Abs(x1 - x2), Math.Abs(y1 - y2))
+                If rect.Height < ct.MinHeight Then
+                    ct.MinHeight = rect.Height
+                End If
+                If rect.Height > ct.MaxHeight Then
+                    ct.MaxHeight = rect.Height
+                End If
                 Dim currChar As New CharInfo(strdata(0), rect)
                 currChar.MakeCache(ct.MainImg)
                 ct.charMap.Add(currChar.c, currChar)
@@ -62,7 +70,7 @@ Public Class CharTemplate
         Using sw As New StreamWriter(filename, False, Encoding.UTF8)
             Dim imgdata As Byte()
             Using ms As New MemoryStream()
-                MainImg.Save(ms, ImageFormat.Jpeg)
+                MainImg.Save(ms, ImageFormat.Png)
                 imgdata = ms.ToArray()
             End Using
             sw.WriteLine(Convert.ToBase64String(imgdata))
@@ -84,41 +92,41 @@ Public Class CharTemplate
 
     Public Function GenerateImage(lines() As String) As Image
         '预处理计算大小~
-        Dim maxw = 0 '最宽行的宽度
-        Dim maxchar = 0 '最多字符数
-        For Each l In lines
-            Dim myw = 0, mychar = 0
-            For Each ch In l
+        Dim LineWidth = 0  '最宽行的宽度
+        'Dim maxchar = 0 '最多字符数
+        For Each line In lines
+            Dim currWidth = 0 ', mychar = 0
+            For Each ch In line
                 Try
                     If Not charMap.ContainsKey(ch) Then
                         Continue For
                     End If
-                    myw += charMap(ch).img.Width
+                    currWidth += charMap(ch).img.Width
                 Catch ex As Exception
                     'Debug.Print(ex.ToString())
                     Debug.Print(ch)
                 End Try
-                mychar += 1
+                'mychar += 1
             Next
-            If myw > maxw Then
-                maxw = myw
+            If currWidth > LineWidth Then
+                LineWidth = currWidth
             End If
-            If mychar > maxchar Then
-                maxchar = mychar
-            End If
+            'If mychar > maxchar Then
+            '    maxchar = mychar
+            'End If
         Next
-        Dim maxh = 0 '单行最高(按理说一样的)
-        For Each ci In charMap.Values
-            If ci.img.Height > maxh Then
-                maxh = ci.img.Height
-            End If
-        Next
+        'Dim maxh = 0 '单行最高(按理说一样的)
+        'For Each ci In charMap.Values
+        '    If ci.img.Height > maxh Then
+        '        maxh = ci.img.Height
+        '    End If
+        'Next
 
-        If maxw <= 0 OrElse maxh * lines.Count <= 0 Then
+        If LineWidth <= 0 OrElse MinHeight * lines.Count <= 0 Then
             Return Nothing
         End If
 
-        Dim result As New Bitmap(maxw, maxh * lines.Count)
+        Dim result As New Bitmap(LineWidth, MinHeight * lines.Count)
         result.SetResolution(MainImg.HorizontalResolution, MainImg.VerticalResolution)
         Using g = Graphics.FromImage(result)
             For y = 0 To lines.Count - 1
@@ -132,16 +140,16 @@ Public Class CharTemplate
                     Dim currImg = charMap(currch).img
                     '仿射变换
                     'currImg = MagicImage(currImg)
-                    g.DrawImage(currImg, offset, y * maxh)
+                    g.DrawImage(currImg, offset, y * MinHeight)
                     offset += currImg.Width
                 Next
                 '空格补齐
                 If charMap.ContainsKey(" ") Then
                     Dim spImg = charMap(" ").img
-                    Dim padding = maxw - offset
-                    Dim paddingCount = padding / spImg.Width
+                    Dim padding = LineWidth - offset
+                    Dim paddingCount = padding / spImg.Width + 1
                     For i = 1 To paddingCount
-                        g.DrawImage(spImg, offset, y * maxh)
+                        g.DrawImage(spImg, offset, y * MinHeight)
                         offset += spImg.Width
                     Next
                 End If
