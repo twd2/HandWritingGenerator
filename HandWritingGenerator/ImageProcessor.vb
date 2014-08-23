@@ -6,34 +6,9 @@ Public Class ImageProcessor
         Return r * 0.299 + g * 0.587 + b * 0.114
     End Function
 
-    Public Shared Function ToGray(id As ImageData) As Integer(,)
-        Dim gr(id.Height - 1, id.Width - 1) As Integer
-        For y = 0 To id.Height - 1
-            For x = 0 To id.Width - 1
-                gr(y, x) = Gray(id(y, x, 0), id(y, x, 1), id(y, x, 2))
-            Next
-        Next
-        Return gr
-    End Function
-
-    Public Shared Function ToGray(i As Bitmap) As Integer(,)
-        Return ToGray(ImageData.FromBitmap(i))
-    End Function
-
-    Public Shared Function Binarization(gr As Integer(,), Optional T As Double = 128) As Boolean(,)
-        'Dim T = FindThreshold(gr, acc)
-        Dim bin(gr.GetUpperBound(0), gr.GetUpperBound(1)) As Boolean
-        For y = 0 To gr.GetUpperBound(0)
-            For x = 0 To gr.GetUpperBound(1)
-                bin(y, x) = gr(y, x) < T
-            Next
-        Next
-        Return bin
-    End Function
-
-    Public Shared Function BinarizationBitmap(bin As Boolean(,)) As Bitmap
-        Dim bmp As New Bitmap(bin.GetUpperBound(1) + 1, bin.GetUpperBound(0) + 1)
-        Dim id = ImageData.FromBitmap(bmp)
+    Public Shared Function BinarizationBitmap(bin As BinaryData) As Bitmap
+        Dim bmp As New Bitmap(bin.Height, bin.Width)
+        Dim id = RawData.FromBitmap(bmp)
         For y = 0 To bmp.Height - 1
             For x = 0 To bmp.Width - 1
                 Dim a = IIf(bin(y, x), 0, 255)
@@ -43,14 +18,14 @@ Public Class ImageProcessor
             Next
         Next
         Dim bmpdata = bmp.LockBits(New Rectangle(0, 0, bmp.Width, bmp.Height), Imaging.ImageLockMode.WriteOnly, Imaging.PixelFormat.Format24bppRgb)
-        Marshal.Copy(id.bmpdata, 0, bmpdata.Scan0, id.Size())
+        Marshal.Copy(id.data, 0, bmpdata.Scan0, id.Size())
         bmp.UnlockBits(bmpdata)
         Return bmp
     End Function
 
-    Public Shared Function GrayBitmap(gr As Integer(,)) As Bitmap
-        Dim bmp As New Bitmap(gr.GetUpperBound(1) + 1, gr.GetUpperBound(0) + 1)
-        Dim id = ImageData.FromBitmap(bmp)
+    Public Shared Function GrayBitmap(gr As GrayData) As Bitmap
+        Dim bmp As New Bitmap(gr.Width, gr.Height)
+        Dim id = RawData.FromBitmap(bmp)
         For y = 0 To bmp.Height - 1
             For x = 0 To bmp.Width - 1
                 Dim a = gr(y, x)
@@ -60,20 +35,20 @@ Public Class ImageProcessor
             Next
         Next
         Dim bmpdata = bmp.LockBits(New Rectangle(0, 0, bmp.Width, bmp.Height), Imaging.ImageLockMode.WriteOnly, Imaging.PixelFormat.Format24bppRgb)
-        Marshal.Copy(id.bmpdata, 0, bmpdata.Scan0, id.Size())
+        Marshal.Copy(id.data, 0, bmpdata.Scan0, id.Size())
         bmp.UnlockBits(bmpdata)
         Return bmp
     End Function
 
     '寻找二值化的阈值
-    Public Shared Function FindThreshold(gr As Integer(,), Optional accuracy As Double = 0.1) As Double
+    Public Shared Function FindBinarizationThreshold(gr As GrayData, Optional accuracy As Double = 0.1) As Double
         Dim lastT = 0.0, T = 127.5
         Do While Math.Abs(T - lastT) > accuracy
             lastT = T
             Dim sumW = 0L, sumB = 0L
             Dim countW = 0, countB = 0
-            For y = 0 To gr.GetUpperBound(0)
-                For x = 0 To gr.GetUpperBound(1)
+            For y = 0 To gr.Height - 1
+                For x = 0 To gr.Width - 1
                     If gr(y, x) >= T Then 'white
                         countW += 1
                         sumW += gr(y, x)
@@ -96,7 +71,7 @@ Public Class ImageProcessor
         Return T
     End Function
 
-    Public Shared Function CutImg(src As Image, rect As Rectangle) As Bitmap
+    Public Shared Function CutImage(src As Image, rect As Rectangle) As Bitmap
         Dim result As New Bitmap(rect.Width, rect.Height)
         result.SetResolution(src.HorizontalResolution, src.VerticalResolution)
         Using g = Graphics.FromImage(result)
@@ -113,16 +88,14 @@ Public Class ImageProcessor
         Dim result(endX - startX - 1 + 1) As Integer
 
         'to raw
-        Dim raw = ImageData.FromBitmap(bmp, New Rectangle(startX, top, endX - startX + 1, bottom - top + 1))
+        Dim raw = RawData.FromBitmap(bmp, New Rectangle(startX, top, endX - startX + 1, bottom - top + 1))
 
         'Binarization
-        Dim gr = ToGray(raw)
-        Dim T = FindThreshold(gr)
-        Dim bin = Binarization(gr, T)
+        Dim bin = BinaryData.FromRawData(raw)
 
-        For x = 0 To bin.GetUpperBound(1)
+        For x = 0 To bin.Width - 1
             result(x) = 0
-            For y = 0 To bin.GetUpperBound(0)
+            For y = 0 To bin.Height - 1
                 result(x) += IIf(bin(y, x), 1, 0)
             Next
         Next
@@ -233,20 +206,54 @@ Public Class ImageProcessor
         Dim result(endY - startY - 1 + 1) As Integer
 
         'to raw
-        Dim raw = ImageData.FromBitmap(bmp, New Rectangle(left, startY, right - left, endY - startY))
+        Dim raw = RawData.FromBitmap(bmp, New Rectangle(left, startY, right - left, endY - startY))
 
         'Binarization
-        Dim gr = ToGray(raw)
-        Dim T = FindThreshold(gr)
-        Dim bin = Binarization(gr, T)
+        Dim bin = BinaryData.FromRawData(raw)
 
-        For y = 0 To bin.GetUpperBound(0)
+        For y = 0 To bin.Height - 1
             result(y) = 0
-            For x = 0 To bin.GetUpperBound(1)
+            For x = 0 To bin.Width - 1
                 result(y) += IIf(bin(y, x), 1, 0)
             Next
         Next
         Return result
     End Function
+
+    'Private Function MagicImage(src As Bitmap) As Bitmap
+    '    Dim res As New Bitmap(src.Width, src.Height)
+    '    Dim a, b, c, d, e, f As Integer
+    '    Dim r As New Random
+    '    a = r.Next(500, 1000)
+    '    b = r.Next(0, 500)
+    '    c = 0 ' r.Next(0, 10)
+    '    d = r.Next(0, 500)
+    '    e = r.Next(500, 1000)
+    '    f = 0 'r.Next(0, 10)
+    '    For y = 0 To src.Height - 1
+    '        For x = 0 To src.Width - 1
+    '            Dim newp = MagicPoint(a, b, c, d, e, f, New Point(x, y))
+    '            Try
+    '                res.SetPixel(newp.X, newp.Y, src.GetPixel(x, y))
+    '            Catch ex As Exception
+
+    '            End Try
+    '        Next
+    '    Next
+    '    Return res
+    'End Function
+
+    'Private Function MagicPoint(a As Integer, b As Integer, c As Integer, d As Integer, e As Integer, f As Integer, src As Point) As Point
+    '    Dim x, y As Integer
+    '    'a *= 1000
+    '    'b *= 1000
+    '    'c *= 1000
+    '    'd *= 1000
+    '    'e *= 1000
+    '    'f *= 1000
+    '    x = a * src.X / 1000 + b * src.Y / 1000 + c
+    '    y = d * src.X / 1000 + e * src.Y / 1000 + f
+    '    Return New Point(x, y)
+    'End Function
 
 End Class

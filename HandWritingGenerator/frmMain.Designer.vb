@@ -29,6 +29,7 @@ Partial Class frmMain
         Me.Button4 = New System.Windows.Forms.Button()
         Me.SplitContainer1 = New System.Windows.Forms.SplitContainer()
         Me.TextBox1 = New System.Windows.Forms.TextBox()
+        Me.Button5 = New System.Windows.Forms.Button()
         CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SplitContainer1.Panel1.SuspendLayout()
         Me.SplitContainer1.Panel2.SuspendLayout()
@@ -42,7 +43,7 @@ Partial Class frmMain
         Me.Button1.Name = "Button1"
         Me.Button1.Size = New System.Drawing.Size(128, 29)
         Me.Button1.TabIndex = 0
-        Me.Button1.Text = "模版编辑器"
+        Me.Button1.Text = "模板编辑器"
         Me.Button1.UseVisualStyleBackColor = True
         '
         'Button2
@@ -117,18 +118,28 @@ Partial Class frmMain
         Me.TextBox1.Size = New System.Drawing.Size(317, 479)
         Me.TextBox1.TabIndex = 0
         '
-        'Form1
+        'Button5
+        '
+        Me.Button5.Location = New System.Drawing.Point(559, 15)
+        Me.Button5.Name = "Button5"
+        Me.Button5.Size = New System.Drawing.Size(98, 29)
+        Me.Button5.TabIndex = 6
+        Me.Button5.Text = "排版测试"
+        Me.Button5.UseVisualStyleBackColor = True
+        '
+        'frmMain
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(8.0!, 15.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(669, 548)
+        Me.Controls.Add(Me.Button5)
         Me.Controls.Add(Me.SplitContainer1)
         Me.Controls.Add(Me.Button4)
         Me.Controls.Add(Me.Button3)
         Me.Controls.Add(Me.Button2)
         Me.Controls.Add(Me.Button1)
         Me.Margin = New System.Windows.Forms.Padding(4)
-        Me.Name = "Form1"
+        Me.Name = "frmMain"
         Me.Text = "手写体生成器"
         CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).EndInit()
         Me.SplitContainer1.Panel1.ResumeLayout(False)
@@ -146,5 +157,6 @@ Partial Class frmMain
     Friend WithEvents Button4 As System.Windows.Forms.Button
     Friend WithEvents SplitContainer1 As System.Windows.Forms.SplitContainer
     Friend WithEvents TextBox1 As System.Windows.Forms.TextBox
+    Friend WithEvents Button5 As System.Windows.Forms.Button
 
 End Class
