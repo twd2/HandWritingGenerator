@@ -92,19 +92,19 @@ Partial Class frmEditor
         '
         Me.ContextMenuStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.SaveImageToolStripMenuItem, Me.生成图线GToolStripMenuItem})
         Me.ContextMenuStrip1.Name = "ContextMenuStrip1"
-        Me.ContextMenuStrip1.Size = New System.Drawing.Size(176, 80)
+        Me.ContextMenuStrip1.Size = New System.Drawing.Size(160, 52)
         '
         'SaveImageToolStripMenuItem
         '
         Me.SaveImageToolStripMenuItem.Name = "SaveImageToolStripMenuItem"
-        Me.SaveImageToolStripMenuItem.Size = New System.Drawing.Size(175, 24)
+        Me.SaveImageToolStripMenuItem.Size = New System.Drawing.Size(159, 24)
         Me.SaveImageToolStripMenuItem.Text = "保存图片(&S)"
         '
         '生成图线GToolStripMenuItem
         '
         Me.生成图线GToolStripMenuItem.Enabled = False
         Me.生成图线GToolStripMenuItem.Name = "生成图线GToolStripMenuItem"
-        Me.生成图线GToolStripMenuItem.Size = New System.Drawing.Size(175, 24)
+        Me.生成图线GToolStripMenuItem.Size = New System.Drawing.Size(159, 24)
         Me.生成图线GToolStripMenuItem.Text = "生成图线(&G)"
         '
         'DisplayOffsetX
@@ -252,6 +252,7 @@ Partial Class frmEditor
         Me.ListView1.FullRowSelect = True
         Me.ListView1.Location = New System.Drawing.Point(16, 205)
         Me.ListView1.Margin = New System.Windows.Forms.Padding(4)
+        Me.ListView1.MultiSelect = False
         Me.ListView1.Name = "ListView1"
         Me.ListView1.Size = New System.Drawing.Size(850, 426)
         Me.ListView1.TabIndex = 16

@@ -8,7 +8,8 @@ Public Class CharTemplate
     Public MainImg As Bitmap = Nothing
     Public MaxHeight As Integer = 0
     Public MinHeight As Integer = Integer.MaxValue
-
+    Public MaxWidth As Integer = 0
+    Public MinWidth As Integer = Integer.MaxValue
     Public Sub New()
 
     End Sub
@@ -33,6 +34,12 @@ Public Class CharTemplate
                 End If
                 If rect.Height > ct.MaxHeight Then
                     ct.MaxHeight = rect.Height
+                End If
+                If rect.Width < ct.MinWidth Then
+                    ct.MinWidth = rect.Width
+                End If
+                If rect.Width > ct.MaxWidth Then
+                    ct.MaxWidth = rect.Width
                 End If
                 Dim currChar As New CharInfo(strdata(0), rect)
                 currChar.MakeCache(ct.MainImg)

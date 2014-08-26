@@ -69,19 +69,19 @@ Public Class ImageProcessor
     End Function
 
     '寻找每列黑点数的阈值, 使得大于等于阈值的为字符的一部分
-    Public Shared Function FindCountThreshold(count As Integer(), Optional accuracy As Double = 0.1) As Double
+    Public Shared Function FindBlackCountThreshold(blackcount As Integer(), Optional accuracy As Double = 0.1) As Double
         Dim lastT = -1.0, T = 1.0
         Do While Math.Abs(T - lastT) > accuracy
             lastT = T
             Dim sumChar = 0L, sumSpace = 0L
             Dim countChar = 0, countSpace = 0
-            For i = 0 To count.Length - 1
-                If count(i) >= T Then 'Char
+            For i = 0 To blackcount.Length - 1
+                If blackcount(i) >= T Then 'Char
                     countChar += 1
-                    sumChar += count(i)
+                    sumChar += blackcount(i)
                 Else 'Space
                     countSpace += 1
-                    sumSpace += count(i)
+                    sumSpace += blackcount(i)
                 End If
             Next
             If countChar = 0 Then
@@ -98,12 +98,12 @@ Public Class ImageProcessor
     End Function
 
     '计算连续为字符/空格的个数也就是字符/空格的宽度
-    Public Shared Function SplitCount(count As Integer(), Optional T As Integer = 0) As List(Of CharRegion)
+    Public Shared Function SplitBlackCount(blackcount As Integer(), Optional T As Integer = 0) As List(Of CharRegion)
         Dim Regions As New List(Of CharRegion)
         Dim currRegion As CharRegion
         Dim start = 0
-        Do While start <= count.Length - 1
-            currRegion = CharRegion.Read(count, start, T)
+        Do While start <= blackcount.Length - 1
+            currRegion = CharRegion.Read(blackcount, start, T)
             Regions.Add(currRegion)
             start = currRegion.RightOffset + 1
         Loop
@@ -184,6 +184,117 @@ Public Class ImageProcessor
             Next
         Next
         Return result
+    End Function
+
+    Public Shared Function FindBlocks(bd As BinaryData, Optional color As Boolean = True, Optional maxAcreagePerBlock As Integer = -1) As List(Of Block)
+        Dim lstblk As New List(Of Block)
+        Dim mark(bd.Height - 1, bd.Width - 1) As Boolean
+        For y = 0 To bd.Height - 1
+            For x = 0 To bd.Width - 1
+                If Not mark(y, x) Then
+                    Dim blk As New Block
+                    innerFloodFill(bd, x, y, blk, mark, color, maxAcreagePerBlock)
+                    If blk.Acreage > 0 Then
+                        lstblk.Add(blk)
+                    End If
+                End If
+            Next
+        Next
+        Return lstblk
+    End Function
+
+    Public Shared Function FloodFill(bd As BinaryData, x0 As Integer, y0 As Integer, Optional color As Boolean = True, Optional maxAcreage As Integer = -1) As Block
+        Dim ffr As New Block
+        Dim mark(bd.Height - 1, bd.Width - 1) As Boolean
+        innerFloodFill(bd, x0, y0, ffr, mark, color, maxAcreage)
+        Return ffr
+    End Function
+
+    Private Shared Sub innerFloodFill(bd As BinaryData, x0 As Integer, y0 As Integer, blk As Block, ByRef mark As Boolean(,), color As Boolean, maxAcreage As Integer)
+        Dim Q As New Queue(Of Point)
+        Q.Enqueue(New Point(x0, y0))
+        Do While Q.Count > 0
+            Dim p = Q.Dequeue()
+            If p.X < 0 OrElse p.X > bd.Width - 1 Then '超出边界
+                Continue Do
+            End If
+            If p.Y < 0 OrElse p.Y > bd.Height - 1 Then '超出边界
+                Continue Do
+            End If
+            If mark(p.Y, p.X) Then '已经处理过了
+                Continue Do
+            End If
+            mark(p.Y, p.X) = True
+            If maxAcreage >= 0 AndAlso blk.Acreage >= maxAcreage Then
+                Return
+            End If
+            If bd(p.Y, p.X) = color Then
+                blk.Add(p.X, p.Y)
+                Q.Enqueue(New Point(p.X - 1, p.Y))
+                Q.Enqueue(New Point(p.X + 1, p.Y))
+                Q.Enqueue(New Point(p.X, p.Y - 1))
+                Q.Enqueue(New Point(p.X, p.Y + 1))
+                'innerFloodFill(bd, x - 1, y, ffr, mark, color, maxAcreage)
+                'innerFloodFill(bd, x + 1, y, ffr, mark, color, maxAcreage)
+                'innerFloodFill(bd, x, y - 1, ffr, mark, color, maxAcreage)
+                'innerFloodFill(bd, x, y + 1, ffr, mark, color, maxAcreage)
+            End If
+        Loop
+    End Sub
+
+    Public Shared Function FindSquares(lstblk As List(Of Block), acreage As Integer, Optional accuracy As Double = 0.25) As List(Of Block)
+        Dim lstsq As New List(Of Block)
+        For Each blk In lstblk
+            If (blk.MaxAcreage / blk.Acreage) <= 2 * (1 + accuracy) Then '正方形旋转45°后, 左右乘上下的面积是正方形面积的2倍
+                'Dim c = blk.Centre
+                If Math.Abs(blk.Acreage - acreage) / acreage < accuracy Then '面积合适
+                    lstsq.Add(blk)
+                End If
+            End If
+        Next
+        Return lstsq
+    End Function
+
+    Public Shared Function RotateClockwise(ByVal bmp As Bitmap, ByVal theta As Double) As Bitmap
+
+        Dim newBmp As Bitmap
+
+        Dim newWidth As Integer = bmp.Width * Math.Cos(theta) + bmp.Height * Math.Sin(theta)
+        Dim newHeight As Integer = bmp.Width * Math.Sin(theta) + bmp.Height * Math.Cos(theta)
+
+        newBmp = New Bitmap(newWidth, newHeight, bmp.PixelFormat)
+        newBmp.SetResolution(bmp.HorizontalResolution, bmp.VerticalResolution)
+        Using g = Graphics.FromImage(newBmp)
+            g.SmoothingMode = Drawing2D.SmoothingMode.HighQuality
+            g.Clear(Color.White)
+            'g.TranslateTransform(0, bmp.Width * Math.Sin(theta))
+            g.TranslateTransform(bmp.Height * Math.Sin(theta), 0)
+            g.RotateTransform(theta / Math.PI * 180)
+            g.DrawImage(bmp, New Rectangle(0, 0, bmp.Width, bmp.Height))
+        End Using
+
+        Return newBmp
+    End Function
+
+    Public Shared Function RotateCounterclockwise(ByVal bmp As Bitmap, ByVal theta As Double) As Bitmap
+
+        Dim newBmp As Bitmap
+
+        Dim newWidth As Integer = bmp.Width * Math.Cos(theta) + bmp.Height * Math.Sin(theta)
+        Dim newHeight As Integer = bmp.Width * Math.Sin(theta) + bmp.Height * Math.Cos(theta)
+
+        newBmp = New Bitmap(newWidth, newHeight, bmp.PixelFormat)
+        newBmp.SetResolution(bmp.HorizontalResolution, bmp.VerticalResolution)
+        Using g = Graphics.FromImage(newBmp)
+            g.SmoothingMode = Drawing2D.SmoothingMode.HighQuality
+            g.Clear(Color.White)
+            g.TranslateTransform(0, bmp.Width * Math.Sin(theta))
+            'g.TranslateTransform(bmp.Height * Math.Sin(theta), 0)
+            g.RotateTransform(-theta / Math.PI * 180)
+            g.DrawImage(bmp, New Rectangle(0, 0, bmp.Width, bmp.Height))
+        End Using
+
+        Return newBmp
     End Function
 
     'Private Function MagicImage(src As Bitmap) As Bitmap

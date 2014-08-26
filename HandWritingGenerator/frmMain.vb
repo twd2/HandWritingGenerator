@@ -6,7 +6,7 @@ Public Class frmMain
     Dim _TplPath As String = ""
     Dim _CharTemplate As CharTemplate = Nothing
 
-    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+    Private Sub Button1_Click(sender As Object, e As EventArgs)
         frmEditor.Show()
     End Sub
 
@@ -28,7 +28,7 @@ Public Class frmMain
         Return _CharTemplate.GenerateImage(data)
     End Function
 
-    Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
+    Private Sub Button2_Click(sender As Object, e As EventArgs)
         'PictureBox1.Image = ToImgByTemplate({"he"})
         PictureBox1.Image = ToImgByTemplate({"hello, world",
                                              "abcde9f8g7h6i5j4k3l2m1n0",
@@ -36,7 +36,7 @@ Public Class frmMain
         PictureBox1.Refresh()
     End Sub
 
-    Private Sub Button3_Click(sender As Object, e As EventArgs) Handles Button3.Click
+    Private Sub FromText(Bin As Boolean)
         If Not RequireTemplate() Then
             Return
         End If
@@ -66,7 +66,7 @@ Public Class frmMain
                     lstPage.Add(currPage)
                     currPage = New List(Of String)
                 End If
-                currPage.Add(lns(i))
+                currPage.Add("    " + lns(i) + "    ")
             Next
             If currPage.Count > 0 Then
                 lstPage.Add(currPage)
@@ -79,14 +79,25 @@ Public Class frmMain
             End If
 
             For i = 0 To lstPage.Count - 1
-                ToImgByTemplate(lstPage(i).ToArray()).Save(SaveTo + "\P" & i.ToString() & ".jpg")
+                Dim img = ToImgByTemplate(lstPage(i).ToArray())
+                If Bin Then
+                    img = BinaryData.FromBitmap(img).ToBitmap()
+                    Dim gd = GrayData.FromBitmap(img)
+                    gd.Average()
+                    img = gd.ToBitmap()
+                End If
+                img.Save(SaveTo + "\P" & i.ToString() & ".jpg")
             Next
             MsgBox("完成")
         End Using
+    End Sub
+
+    Private Sub Button3_Click(sender As Object, e As EventArgs)
+
 
     End Sub
 
-    Private Sub Button4_Click(sender As Object, e As EventArgs) Handles Button4.Click
+    Private Sub Button4_Click(sender As Object, e As EventArgs)
         LoadTemplate()
     End Sub
 
@@ -116,7 +127,7 @@ Public Class frmMain
         End Try
     End Sub
 
-    Private Sub Button5_Click(sender As Object, e As EventArgs) Handles Button5.Click
+    Private Sub Button5_Click(sender As Object, e As EventArgs)
         If Not RequireTemplate() Then
             Return
         End If
@@ -126,7 +137,7 @@ Public Class frmMain
         ts.PageWidth = 30
         'ts.PageMaxLineCount = Integer.MaxValue
         ts.Typeset(False)
-        ts.ToString()
+        Debug.Print(ts.ToString())
     End Sub
 
     Private Function RequireTemplate() As Boolean
@@ -148,5 +159,49 @@ Public Class frmMain
             End If
             PictureBox1.Image.Save(SFD.FileName, ImageFormat.Png)
         End Using
+    End Sub
+
+    Private Sub 加载模板ToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles 加载模板ToolStripMenuItem.Click
+        LoadTemplate()
+    End Sub
+
+    Private Sub ToolStripMenuItem1_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItem1.Click
+        frmEditor.Show()
+    End Sub
+
+    Private Sub 从文本文件TToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles 从文本文件TToolStripMenuItem.Click
+        FromText(False)
+    End Sub
+
+    Private Sub HelloWorldHToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles HelloWorldHToolStripMenuItem.Click
+        PictureBox1.Image = ToImgByTemplate({"hello, world",
+                                           "abcde9f8g7h6i5j4k3l2m1n0",
+                                           "The quick brown fox jumps over the lazy dog."})
+        PictureBox1.Refresh()
+    End Sub
+
+    Private Sub 排版测试TToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles 排版测试TToolStripMenuItem.Click
+        If Not RequireTemplate() Then
+            Return
+        End If
+        Dim token As New Tokenizer(File.ReadAllText("test.txt"))
+        token.Scan()
+        Dim ts As New Typesetter(token, _CharTemplate)
+        ts.PageWidth = 30
+        'ts.PageMaxLineCount = Integer.MaxValue
+        ts.Typeset(False)
+        Debug.Print(ts.ToString())
+    End Sub
+
+    Private Sub 从文本文件黑白BToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles 从文本文件黑白BToolStripMenuItem.Click
+        FromText(True)
+    End Sub
+
+    Private Sub 其它OToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles 其它OToolStripMenuItem.Click
+
+    End Sub
+
+    Private Sub ToolStripMenuItem4_Click(sender As Object, e As EventArgs) Handles ToolStripMenuItem4.Click
+        frmPreprocess.Show()
     End Sub
 End Class

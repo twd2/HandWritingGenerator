@@ -73,6 +73,7 @@
     <Compile Include="CharInfo.vb" />
     <Compile Include="CharRegion.vb" />
     <Compile Include="CharTemplate.vb" />
+    <Compile Include="Block.vb" />
     <Compile Include="frmMain.vb">
       <SubType>Form</SubType>
     </Compile>
@@ -84,6 +85,12 @@
       <DependentUpon>frmEditor.vb</DependentUpon>
     </Compile>
     <Compile Include="frmEditor.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmPreprocess.Designer.vb">
+      <DependentUpon>frmPreprocess.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frmPreprocess.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="GrayData.vb" />
@@ -104,6 +111,8 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="RectangleWithOffset.vb" />
+    <Compile Include="TiltCorrection.vb" />
     <Compile Include="Tokenizer.vb" />
     <Compile Include="Typesetter.vb" />
   </ItemGroup>
@@ -113,6 +122,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="frmEditor.resx">
       <DependentUpon>frmEditor.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmPreprocess.resx">
+      <DependentUpon>frmPreprocess.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="My Project\Resources.resx">
       <Generator>VbMyResourcesResXFileCodeGenerator</Generator>

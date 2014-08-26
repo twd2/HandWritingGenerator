@@ -30,6 +30,33 @@
         End Get
     End Property
 
+    Public Sub Average()
+        For y = 1 To Height - 1 - 1
+            For x = 1 To Width - 1 - 1
+                'If raw(y, x) <> 0 Then
+                Dim a As Integer = 0
+                a += data(y - 1, x - 1)
+                a += data(y - 1, x)
+                a += data(y - 1, x + 1)
+                a += data(y, x - 1)
+                a += data(y, x)
+                a += data(y, x + 1)
+                a += data(y + 1, x - 1)
+                a += data(y + 1, x)
+                a += data(y + 1, x + 1)
+                Dim b = a / 9
+                'If a <> 255 * 9 Then '周围不都是白色
+                '    b = a / 12
+                'End If
+                If b > 255 Then
+                    b = 255
+                End If
+                raw(y, x) = b
+                'End If
+            Next
+        Next
+    End Sub
+
     Public Shared Function FromBitmap(bmp As Bitmap) As GrayData
         Dim rd = RawData.FromBitmap(bmp)
         Return FromRawData(rd)

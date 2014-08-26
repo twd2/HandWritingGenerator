@@ -14,8 +14,9 @@ Public Class frmEditor
 
     Dim _DisplayImg As Bitmap = Nothing
     Dim _DisplayG As Graphics
-    Dim _offsetX = 0, _offsetY = 0
-    Dim _TOffsetValue = 0, _BOffsetValue = 10, _LOffsetValue = 0, _ROffsetValue = 0
+    Dim _offsetX As Integer = 0, _offsetY As Integer = 0
+    Dim _TOffsetValue As Integer = 0, _BOffsetValue As Integer = 10,
+        _LOffsetValue As Integer = 0, _ROffsetValue As Integer = 0
     Dim _LRTB As LRTB = LRTB.Top
     Dim _CharTemplate As CharTemplate
 
@@ -43,15 +44,17 @@ Public Class frmEditor
     Private Sub RefreshImg()
         Try
             _DisplayG.Clear(Color.White)
-            _DisplayG.DrawImage(_CharTemplate.MainImg, 0 + _offsetX, 0 + _offsetY)
+            _DisplayG.ResetTransform()
+            _DisplayG.TranslateTransform(_offsetX, _offsetY)
+            _DisplayG.DrawImage(_CharTemplate.MainImg, 0, 0)
             '左
-            _DisplayG.DrawLine(Pens.Blue, _LOffsetValue + _offsetX, 0 + _offsetY, _LOffsetValue + _offsetX, _CharTemplate.MainImg.Height + _offsetY)
+            _DisplayG.DrawLine(Pens.Blue, _LOffsetValue, 0, _LOffsetValue, _CharTemplate.MainImg.Height)
             '右
-            _DisplayG.DrawLine(Pens.Chocolate, _ROffsetValue + _offsetX, 0 + _offsetY, _ROffsetValue + _offsetX, _CharTemplate.MainImg.Height + _offsetY)
+            _DisplayG.DrawLine(Pens.Chocolate, _ROffsetValue, 0, _ROffsetValue, _CharTemplate.MainImg.Height)
             '上
-            _DisplayG.DrawLine(Pens.Red, 0 + _offsetX, _TOffsetValue + _offsetY, _CharTemplate.MainImg.Width + _offsetX, _TOffsetValue + _offsetY)
+            _DisplayG.DrawLine(Pens.Red, 0, _TOffsetValue, _CharTemplate.MainImg.Width, _TOffsetValue)
             '下
-            _DisplayG.DrawLine(Pens.Green, 0 + _offsetX, _BOffsetValue + _offsetY, _CharTemplate.MainImg.Width + _offsetX, _BOffsetValue + _offsetY)
+            _DisplayG.DrawLine(Pens.Green, 0, _BOffsetValue, _CharTemplate.MainImg.Width, _BOffsetValue)
             Try
                 PictureBox1.Refresh()
             Catch ex As Exception
@@ -181,6 +184,8 @@ Public Class frmEditor
         End If
         '_lstChars.Add(New myChar With {.c = TextBox1.Text, .x1 = LOffset.Value, .x2 = ROffset.Value, .y1 = TOffset.Value, .y2 = BOffset.Value})
         RefreshTable()
+
+        TextBox1.Text = ChrW(AscW(TextBox1.Text) + 1)
     End Sub
 
     Private Sub RefreshTable()
@@ -353,7 +358,7 @@ Public Class frmEditor
         'PictureBox1.Refresh()
         Dim data = ImageProcessor.CalcVerticalBlackCount(_CharTemplate.MainImg, _ROffsetValue + 1, _CharTemplate.MainImg.Width - 1, _TOffsetValue, _BOffsetValue)
         Dim T = 5 'ImageProcessor.FindCountThreshold(data)
-        Dim CharRegions = ImageProcessor.SplitCount(data, T)
+        Dim CharRegions = ImageProcessor.SplitBlackCount(data, T)
         Dim CharRegionsOffset = _ROffsetValue
         Dim minlength = ImageProcessor.FindFragmentThreshold(CharRegions)
         ImageProcessor.CombineFragment(CharRegions, minlength)
@@ -386,8 +391,14 @@ Public Class frmEditor
         _LastCalcROffset = ROffset.Value
         AutoPostion()
 
-        TextBox1.Text = ChrW(AscW(TextBox1.Text) + 1)
-
         _EnabledAutoCalc = True
+    End Sub
+
+    Private Sub Label7_Click(sender As Object, e As EventArgs) Handles Label7.Click
+
+    End Sub
+
+    Private Sub Label6_Click(sender As Object, e As EventArgs) Handles Label6.Click
+
     End Sub
 End Class

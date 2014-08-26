@@ -32,9 +32,19 @@ Public Class BinaryData
         End Get
     End Property
 
-    Public Shared Function FromBitmap(bmp As Bitmap) As BinaryData
+    Public Shared Function FromBitmap(bmp As Bitmap, T As Double) As BinaryData
         Dim rd = RawData.FromBitmap(bmp)
+        Return FromRawData(rd, T)
+    End Function
+
+    Public Shared Function FromBitmap(bmp As Bitmap) As BinaryData
+    Dim rd = RawData.FromBitmap(bmp)
         Return FromRawData(rd)
+    End Function
+
+    Public Shared Function FromRawData(rd As RawData, T As Double) As BinaryData
+        Dim gd = GrayData.FromRawData(rd)
+        Return FromGrayData(gd, T)
     End Function
 
     Public Shared Function FromRawData(rd As RawData) As BinaryData

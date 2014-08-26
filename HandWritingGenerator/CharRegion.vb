@@ -21,18 +21,18 @@ Public Class CharRegion
         b.deleted = True
     End Sub
 
-    Public Shared Function Read(count As Integer(), start As Integer, Optional T As Integer = 0) As CharRegion
+    Public Shared Function Read(blackcount As Integer(), start As Integer, Optional T As Integer = 0) As CharRegion
         Dim cr As New CharRegion
         Dim counting = False
-        If count(start) >= T Then
+        If blackcount(start) >= T Then
             cr.Type = CharRegionType.Char
-            For i = start To count.Length - 1
-                If Not counting AndAlso count(i) >= T Then 'Char
+            For i = start To blackcount.Length - 1
+                If Not counting AndAlso blackcount(i) >= T Then 'Char
                     counting = True
                     cr.LeftOffset = i
                 End If
                 If counting Then
-                    If count(i) < T Then
+                    If blackcount(i) < T Then
                         cr.RightOffset = i - 1
                         Exit For
                     End If
@@ -40,13 +40,13 @@ Public Class CharRegion
             Next
         Else
             cr.Type = CharRegionType.Space
-            For i = start To count.Length - 1
-                If Not counting AndAlso count(i) < T Then 'Space
+            For i = start To blackcount.Length - 1
+                If Not counting AndAlso blackcount(i) < T Then 'Space
                     counting = True
                     cr.LeftOffset = i
                 End If
                 If counting Then
-                    If count(i) >= T Then
+                    If blackcount(i) >= T Then
                         cr.RightOffset = i - 1
                         Exit For
                     End If
