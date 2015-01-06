@@ -15,4 +15,4 @@ Instructions
 1. Repeat ↑.
 1. Click "保存模板".
 1. Click "加载模板".
-1. Put something into the bigest textbox.
+1. Put something into the biggest textbox.
